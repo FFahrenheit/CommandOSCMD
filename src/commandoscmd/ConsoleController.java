@@ -36,6 +36,11 @@ public class ConsoleController
      */
     public void handleCall(String command)
     {
+        if(command.trim().equals(""))
+        {
+            log("");
+            return;
+        }
         String[] commands = command.split(" ");
         switch(commands[0].trim().toLowerCase())
         {
@@ -393,13 +398,17 @@ public class ConsoleController
                 + "date:      Muestra la fecha y hora actual\n"
                 + "dec:       Decrementa en uno una variable\n"
                 + "divi:      Divide dos valores (variable o numeros)\n"
+                + "fact:      Obtiene el factorial de un valor (variable o numero)\n"
                 + "helpti:    Muestra ayuda con el manejo de CommandOS\n"
                 + "inc:       Incrementa en uno una variable\n"
+                + "ln:        Obtiene el logaritmo natural de un valor (variable o numero)\n"
+                + "log:       Obtiene el logaritmo base n de un valor\n"
                 + "modus:     Calcula el residuo de la division de dos valores (variable o numeros)\n"
                 + "multi:     Multiplica dos valores(variable o numeros)\n"
                 + "pow:       Eleva un valor a una potencia (variables o numeris)\n"
                 + "prompti:   Cambia el prompt de la consola\n"
                 + "rest:      Resta dos valores (variable o numeros)\n"
+                + "sqrt:      Obtiene la raiz cuadrado de un valor (variable o numero)\n"
                 + "sum:       Suma dos valores (variable o numeros)\n"
                 + "value:     Muestra el valor de la(s) variable(s)\n"
                 + "vari:      Crea variables numericas";
@@ -422,8 +431,6 @@ public class ConsoleController
     /***
      * Maneja el comando de salida
      * Imprime el mensaje de saida y despues de 2 segundos sale del programa
-     * DISCLAIMER: El comando sleep tiene problemas despues de imprimir el comando, 
-     * esto por como funcionan los JFrame, por lo que se optó por una alternativa
      */
     private void exit()
     {
