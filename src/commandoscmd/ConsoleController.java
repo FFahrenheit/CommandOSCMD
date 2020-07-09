@@ -5,6 +5,7 @@
  */
 package commandoscmd;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
@@ -53,6 +54,9 @@ public class ConsoleController
                 break;
             case "vari":
                 createVariable(commands);
+                break;
+            case "clear":
+                clearScreen();
                 break;
             case "helpti":
                 showHelp(commands);
@@ -370,6 +374,19 @@ public class ConsoleController
         log(text);
     }
     
+    private void clearScreen()
+    {
+        try
+        {
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        }
+        catch(IOException | InterruptedException ex)
+        {
+            log("No se pudo limpiar la pantalla");
+        }
+        log("");
+    }
+    
     /***
      * Maneja el comando de salida
      * Imprime el mensaje de saida y despues de 2 segundos sale del programa
@@ -388,18 +405,6 @@ public class ConsoleController
             System.out.println("Error jsjs");
         }
         System.exit(0);
-//        new java.util.Timer().schedule
-//        (
-//            new java.util.TimerTask() 
-//            {
-//                @Override
-//                public void run() 
-//                {
-//                    System.exit(0);                 //Muchos errores con Thread.Sleep
-//                }
-//            }, 
-//            2000 
-//        );
     }
     
     /***
