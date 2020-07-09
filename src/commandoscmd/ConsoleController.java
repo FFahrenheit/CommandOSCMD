@@ -41,6 +41,9 @@ public class ConsoleController
         {
             case "inc":
             case "dec":
+            case "sqrt":
+            case "ln":
+            case "fact":
                 doOperator(commands);
                 break;
             case "sum":
@@ -169,13 +172,42 @@ public class ConsoleController
                 return null;
             }
         }
-        switch(args[0].toLowerCase()) //ToDo
+        if(isValidArgument(args[1]))
         {
-            case "sqrt":
-            case "fact":
-            case "log":
-            case "ln":
-                break;
+            if(getValue(args[1])<0)
+            {
+                logCheck("No es posible realizar la operacion con numeros negativos",register);
+                return null;
+            }
+            double variable = getValue(args[1]);
+            double res;
+            switch(args[0].toLowerCase()) //ToDo
+            {
+                case "sqrt":
+                    res = Math.sqrt(variable);
+                    logCheck("sqrt("+variable+") = "+res,register);
+                    return res;
+                case "fact":
+                    if((variable == Math.floor(variable)) && !Double.isInfinite(variable))
+                    {
+                        int result = factorial((int)variable);
+                        logCheck(""+variable+"! = "+result,register);
+                        return (double) result;
+                    }
+                    else
+                    {
+                        logCheck("El factorial solo puede ser aplicado a numeros enteros",register);
+                        return null;
+                    }
+                case "ln":
+                    res = Math.log(variable);
+                    logCheck("ln "+variable+" = "+res,register);
+                    return res;
+            }
+        }
+        else
+        {
+            logCheck("El valor no es un numero valido o una variable declarada",register);
         }
         return null;
     }
@@ -515,5 +547,15 @@ public class ConsoleController
         {
             log(message);
         }
+    }
+    
+    /***
+     * Calcula el factorial de forma recursiva
+     * @param n numero a calcular factorial
+     * @return factorial
+     */
+    private int factorial(int n)
+    {
+        return n==0 ? 1 : n * factorial(n-1);
     }
 }
