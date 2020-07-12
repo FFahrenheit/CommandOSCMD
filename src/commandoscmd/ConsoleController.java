@@ -7,6 +7,7 @@ package commandoscmd;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Set;
@@ -108,11 +109,11 @@ public class ConsoleController
      */
     private void changeValue(String[] commands)
     {
+        Double newValue = null;
         if(commands.length == 3)
         {
             if(vars.containsKey(commands[1]))
             {
-                Double newValue;
                 if(isNumeric(commands[2]))
                 {
                     newValue = getNumericValue(commands[2]);
@@ -126,14 +127,32 @@ public class ConsoleController
                     log("Error, el valor destino es invalido");
                     return;
                 }
-                vars.replace(commands[1], newValue);
-                log("La variable "+ commands[1]+" ahora tiene el valor de "+newValue);
             }
             else
             {
                 log("Error, la variable a asignar el valor no existe");
+                return;
             }
         }
+        else if(commands.length==4)
+        {
+            newValue = executeOperationOneArgument(subArray(commands,2,3), false);
+        }
+        else if(commands.length == 5)
+        {
+            newValue = executeOperationTwoArguments(subArray(commands,2,4), false);
+        }
+        else
+        {
+            log("Error, no se usaron los argumentos adecuados");
+        }
+        if(newValue==null)
+        {
+            log("El valor que se quiere asignar es invalido");
+            return;
+        }
+        vars.replace(commands[1], newValue);
+        log("La variable "+ commands[1]+" ahora tiene el valor de "+newValue);
     }
     
     private void doOperator(String[] args)
@@ -319,7 +338,7 @@ public class ConsoleController
             {
                 text += "\n" + key + " ==> " + vars.get(key);
             }
-            if(keys.size()==0)
+            if(keys.isEmpty())
             {
                 text = "No hay variables declaradas";
             }
@@ -367,9 +386,22 @@ public class ConsoleController
                         return;
                     }
                 }
-                else if(commands.length>3)
+                else if(commands.length==4)
+                {
+                    value = executeOperationOneArgument(subArray(commands,2,3), false);
+                }
+                else if(commands.length == 5)
+                {
+                    value = executeOperationTwoArguments(subArray(commands,2,4), false);
+                }
+                else if(commands.length>5)
                 {
                     log("Demasiados argumentos para el comando vari");
+                    return;
+                }
+                if(value == null)
+                {
+                    log("El resultado de la operacion es invalida");
                     return;
                 }
                 vars.put(name, value);
@@ -391,28 +423,43 @@ public class ConsoleController
      */
     private void showHelp(String[] commands)
     {
-        String text = "Para obtener mas detalles de cada comando, escriba helpti seguido "
-                + "del nombre del comando:\n"
-                + "ciao:      Sale de CommandOS\n"
-                + "clear:     Limpia la consola\n"
-                + "date:      Muestra la fecha y hora actual\n"
-                + "dec:       Decrementa en uno una variable\n"
-                + "divi:      Divide dos valores (variable o numeros)\n"
-                + "fact:      Obtiene el factorial de un valor (variable o numero)\n"
-                + "helpti:    Muestra ayuda con el manejo de CommandOS\n"
-                + "inc:       Incrementa en uno una variable\n"
-                + "ln:        Obtiene el logaritmo natural de un valor (variable o numero)\n"
-                + "log:       Obtiene el logaritmo base n de un valor\n"
-                + "modus:     Calcula el residuo de la division de dos valores (variable o numeros)\n"
-                + "multi:     Multiplica dos valores(variable o numeros)\n"
-                + "pow:       Eleva un valor a una potencia (variables o numeris)\n"
-                + "prompti:   Cambia el prompt de la consola\n"
-                + "rest:      Resta dos valores (variable o numeros)\n"
-                + "sqrt:      Obtiene la raiz cuadrado de un valor (variable o numero)\n"
-                + "sum:       Suma dos valores (variable o numeros)\n"
-                + "value:     Muestra el valor de la(s) variable(s)\n"
-                + "vari:      Crea variables numericas";
-        log(text);
+        if(commands.length == 1)
+        {
+           String text = "Para obtener mas detalles de cada comando, escriba helpti seguido "
+           + "del nombre del comando:\n"
+           + "ciao:      Sale de CommandOS\n"
+           + "clear:     Limpia la consola\n"
+           + "date:      Muestra la fecha y hora actual\n"
+           + "dec:       Decrementa en uno una variable\n"
+           + "divi:      Divide dos valores (variable o numeros)\n"
+           + "fact:      Obtiene el factorial de un valor (variable o numero)\n"
+           + "helpti:    Muestra ayuda con el manejo de CommandOS\n"
+           + "inc:       Incrementa en uno una variable\n"
+           + "ln:        Obtiene el logaritmo natural de un valor (variable o numero)\n"
+           + "log:       Obtiene el logaritmo base n de un valor\n"
+           + "modus:     Calcula el residuo de la division de dos valores (variable o numeros)\n"
+           + "multi:     Multiplica dos valores(variable o numeros)\n"
+           + "pow:       Eleva un valor a una potencia (variables o numeris)\n"
+           + "prompti:   Cambia el prompt de la consola\n"
+           + "rest:      Resta dos valores (variable o numeros)\n"
+           + "sqrt:      Obtiene la raiz cuadrado de un valor (variable o numero)\n"
+           + "sum:       Suma dos valores (variable o numeros)\n"
+           + "value:     Muestra el valor de la(s) variable(s)\n"
+           + "vari:      Crea variables numericas";
+           log(text);   
+        }
+        else
+        {
+            for (int i = 1; i < commands.length ; i++) 
+            {
+                switch(commands[i].trim().toLowerCase())
+                {
+                    case "ciao":
+                        break;
+                }
+
+            }   
+        }
     }
     
     private void clearScreen()
@@ -505,7 +552,7 @@ public class ConsoleController
     {
         try 
         {                        
-            Double val  = Double.parseDouble(value.trim());
+            Double.parseDouble(value.trim());
             return true;
         } catch (NumberFormatException e) 
         {
@@ -565,4 +612,16 @@ public class ConsoleController
     {
         return n==0 ? 1 : n * factorial(n-1);
     }
+    
+    /***
+     * Obtiene el subarray de un array
+     * @param <T> tipo
+     * @param array array orignal
+     * @param beg inicio
+     * @param end fin
+     * @return 
+     */
+    public static<T> T[] subArray(T[] array, int beg, int end) {
+		return Arrays.copyOfRange(array, beg, end + 1);
+	}
 }
