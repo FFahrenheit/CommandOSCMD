@@ -450,15 +450,49 @@ public class ConsoleController
         }
         else
         {
+            String message="";
             for (int i = 1; i < commands.length ; i++) 
             {
+                String text = commands[i].trim().toLowerCase() + ": ";
                 switch(commands[i].trim().toLowerCase())
                 {
                     case "ciao":
+                        text += "Se sale del sistema operativo, despues de dos segundos. Sin parametros";
                         break;
+                    case "clear":
+                        text += "Limpia la pantalla de la consola por completo. Sin parametros";
+                        break;
+                    case "date":
+                        text += "Muestra la fecha actual del sistema. Sin parametros";
+                        break;
+                    case "dec":
+                        text += "Decrementa una variable existente en uno. La sintaxis es <dec variable>."
+                                + "Solo funciona con variables declaradas";
+                        break;
+                    case "divi":
+                        text += "Divide dos valores, que pueden ser numeros o variables. La sintaxis es <divi numerador denominador>.\n"
+                                + "Devuelve el resultado";
+                    case "fact":
+                    case "helpti":
+                    case "inc":
+                    case "ln":
+                    case "log":
+                    case "modus":
+                    case "multi":
+                    case "pow":
+                    case "prompti":
+                    case "rest":
+                    case "sqrt":
+                    case "sum":
+                    case "value":
+                    case "vari":
+                    default:
+                        text += "Este comando no existe";
                 }
-
-            }   
+                text += "\n";
+                message += text;
+            }
+            log(message);
         }
     }
     
