@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Set;
 
-
 /**
  * Clase encargada de controlar los eventos
  * en la consola y llevar el computo del sistema
@@ -24,9 +23,11 @@ public class ConsoleController
     public String VERSION = "0.3";
     private String prompt;
     private Hashtable<String, Double> vars;
+    private long time;
     
     public ConsoleController()
     {
+        time = System.nanoTime();
         vars = new Hashtable<String,Double>();
         prompt = "CommandOS> ";
         System.out.print("Buongiorno! Bienvenido a CommandOS --- [Version "+VERSION+"] by Johann"+"\n"+prompt);
@@ -79,6 +80,9 @@ public class ConsoleController
             case "prompti":
                 changePrompt(command);
                 break;
+            case "free":
+                freeVars(commands);
+                break;
             case "ciao":
                 exit();
                 break;
@@ -88,12 +92,52 @@ public class ConsoleController
             case "assign":
                 changeValue(commands);
                 break;
+            case "time":
+                showTime();
+                break;
             default:
                 log("No se reconoce el comando "+commands[0].trim()+".\nPruebe de nuevo o escriba helpti para obtener ayuda");
                 break;
         }
     }
     
+    private void freeVars(String[] commands)
+    {
+        if(commands.length > 1)
+        {
+            String log = "";
+            for(int i=1; i<commands.length;i++)
+            {
+                if(vars.containsKey(commands[i].trim()))
+                {
+                    vars.remove(commands[i].trim());
+                    log += "\nVariable "+commands[i]+" liberada";
+                }
+                else
+                {
+                    log += "\nNo existe la variable "+commands[i];
+                }
+            }   
+            log(log);
+        }
+        else
+        {
+            log("Se requiere el nombre de la variable para liberar");
+        }
+    }
+    
+    /***
+     * Muestra el tiempo que lleva corriendo el programa
+     */
+    private void showTime()
+    {
+        long t = System.nanoTime() - time;
+        log("El programa ha corrido por "+(t/1000000)+" ms");
+    }
+    
+    /***
+     * Muestra la hora y fecha actual
+     */
     private void currentDate()
     {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
@@ -433,6 +477,7 @@ public class ConsoleController
            + "dec:       Decrementa en uno una variable\n"
            + "divi:      Divide dos valores (variable o numeros)\n"
            + "fact:      Obtiene el factorial de un valor (variable o numero)\n"
+           + "free:      Libera el espacio de una variable\n"
            + "helpti:    Muestra ayuda con el manejo de CommandOS\n"
            + "inc:       Incrementa en uno una variable\n"
            + "ln:        Obtiene el logaritmo natural de un valor (variable o numero)\n"
@@ -444,6 +489,7 @@ public class ConsoleController
            + "rest:      Resta dos valores (variable o numeros)\n"
            + "sqrt:      Obtiene la raiz cuadrado de un valor (variable o numero)\n"
            + "sum:       Suma dos valores (variable o numeros)\n"
+           + "time:      Muestra el tiempo que lleva el programa corriendo\n"
            + "value:     Muestra el valor de la(s) variable(s)\n"
            + "vari:      Crea variables numericas";
            log(text);   
@@ -473,6 +519,7 @@ public class ConsoleController
                         text += "Divide dos valores, que pueden ser numeros o variables. La sintaxis es <divi numerador denominador>.\n"
                                 + "Devuelve el resultado";
                     case "fact":
+                    case "free":
                     case "helpti":
                     case "inc":
                     case "ln":
@@ -481,9 +528,13 @@ public class ConsoleController
                     case "multi":
                     case "pow":
                     case "prompti":
+                        text += "Cambia el prompt del sistema. La sintaxis es <prompti nuevoPrompt>. Se pueden usar espacios. Si no\n"
+                                + "especifican argumentos se vuelve al prompt por default";
                     case "rest":
                     case "sqrt":
                     case "sum":
+                    case "time":
+                        text += "Muestra en milisegundos el tiempo que lleva corriendo el programa. No requiere argumentos";
                     case "value":
                     case "vari":
                     default:
