@@ -95,12 +95,35 @@ public class ConsoleController
             case "time":
                 showTime();
                 break;
+            case "reset":
+                resetProgram();
+                break;
             default:
                 log("No se reconoce el comando "+commands[0].trim()+".\nPruebe de nuevo o escriba helpti para obtener ayuda");
                 break;
         }
     }
     
+    private void resetProgram()
+    {
+        try
+        {
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        }
+        catch(IOException | InterruptedException ex)
+        {
+            log("No se pudo limpiar la pantalla");
+        }
+        prompt = "CommandOS> ";
+        System.out.print("Buongiorno! Bienvenido a CommandOS --- [Version "+VERSION+"] by Johann"+"\n"+prompt);
+        time = System.nanoTime();
+        vars = new Hashtable<>();
+    }
+    
+    /***
+     * Libera el espacio de las variables
+     * @param commands lista de variables
+     */
     private void freeVars(String[] commands)
     {
         if(commands.length > 1)
@@ -486,6 +509,7 @@ public class ConsoleController
            + "multi:     Multiplica dos valores(variable o numeros)\n"
            + "pow:       Eleva un valor a una potencia (variables o numeris)\n"
            + "prompti:   Cambia el prompt de la consola\n"
+           + "reset:     Reinicia el programa\n"
            + "rest:      Resta dos valores (variable o numeros)\n"
            + "sqrt:      Obtiene la raiz cuadrado de un valor (variable o numero)\n"
            + "sum:       Suma dos valores (variable o numeros)\n"
@@ -518,8 +542,12 @@ public class ConsoleController
                     case "divi":
                         text += "Divide dos valores, que pueden ser numeros o variables. La sintaxis es <divi numerador denominador>.\n"
                                 + "Devuelve el resultado";
+                        break;
                     case "fact":
                     case "free":
+                        text += "Libera el espacio y el nombre de una o mas variables. La sintaxis es <free var(s)>. Las variables\n"
+                                + "se separan por espacios.";
+                        break;
                     case "helpti":
                     case "inc":
                     case "ln":
@@ -530,13 +558,25 @@ public class ConsoleController
                     case "prompti":
                         text += "Cambia el prompt del sistema. La sintaxis es <prompti nuevoPrompt>. Se pueden usar espacios. Si no\n"
                                 + "especifican argumentos se vuelve al prompt por default";
+                        break;
+                    case "reset":
+                        text += "Reinicia el programa. Borra las variables y devuelve todo a sus valores iniciales";
+                        break;
                     case "rest":
                     case "sqrt":
                     case "sum":
                     case "time":
                         text += "Muestra en milisegundos el tiempo que lleva corriendo el programa. No requiere argumentos";
+                        break;
                     case "value":
+                        text += "Muestra las variables declaradas con su valor. Si no se especifican argumentos se listan todos. Se puede\n"
+                                + "dar una lista de variables con la sintaxis <value variable(s)> con cada identificador separado por espacio";
+                        break;
                     case "vari":
+                        text += "Declara una variable. La sintaxis es <vari nombre>. Se puede especificar un valor inicial agregando un tercer\n"
+                                + "argumento o especificando una expresion despues del nombre. Ejemplo: vari valor sum 1 1 -> declara una variable\n"
+                                + "llamada valor con un valor de 2 (1+1). Las variables deben empezar con una letra y no pueden tener espacios";
+                        break;
                     default:
                         text += "Este comando no existe";
                 }
