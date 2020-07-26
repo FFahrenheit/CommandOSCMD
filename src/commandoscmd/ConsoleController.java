@@ -24,9 +24,11 @@ public class ConsoleController
     private String prompt;
     private Hashtable<String, Double> vars;
     private long time;
+    private String actualBackup;
     
     public ConsoleController()
     {
+        actualBackup = null;
         time = System.nanoTime();
         vars = new Hashtable<String,Double>();
         prompt = "CommandOS> ";
@@ -46,6 +48,12 @@ public class ConsoleController
         String[] commands = command.split(" ");
         switch(commands[0].trim().toLowerCase())
         {
+            case "save":
+                save(commands);
+                break;
+            case "load":
+                load(commands);
+                break;
             case "inc":
             case "dec":
             case "sqrt":
@@ -104,6 +112,87 @@ public class ConsoleController
         }
     }
     
+    /***
+     * Carga datos de un archivo en el SO
+     * @param commands 
+     */
+    private void load(String[] commands)
+    {
+        if(commands.length==2)
+        {
+            BackupController backup = new BackupController();
+            if(!backup.backupExists(commands[1].trim()))
+            {
+                log("No existe el archivo fuente, no se pudieron recuperar los datos");
+            }
+            else
+            {
+                if(backup.setBackup(commands[1].trim(), this))
+                {
+                    log("Datos cargados. El backup actual es "+commands[1]+".Use save para guardar progreso");                    
+                }
+                else
+                {
+                    log("No se pudieron cargar los datos");
+                }
+            }
+        }
+        else
+        {
+            log("Argumentos invalidos");
+        }
+    }
+    
+    /***
+     * Guarda los datos en un archivo
+     * @param commands 
+     */
+    private void save(String[] commands)
+    {
+        switch (commands.length) 
+        {
+            case 1:
+                if(actualBackup == null)
+                {
+                    log("No existe un backup al cual guardar los datos. Especifique un nombre o elija un backup existente");
+                }
+                else
+                {
+                    BackupController backup = new BackupController();
+                    boolean exists = backup.backupExists(actualBackup);
+                    if(backup.createBackup(actualBackup, this))
+                    {
+                        String message = exists ? "Se ha sobreescrito el backup "+actualBackup : "Datos guardados con exito en "+actualBackup;
+                        log(message);   
+                    }
+                    else
+                    {
+                        log("No se pudo guardar el backup");
+                    }
+                }   break;
+            case 2:
+                BackupController backup = new BackupController();
+                actualBackup = commands[1].trim();
+                boolean exists = backup.backupExists(commands[1].trim());
+                if(backup.createBackup(commands[1].trim(), this))
+                {
+                    String message = exists ? "Se ha sobreescrito el backup "+actualBackup : "Datos guardados con exito en "+actualBackup;
+                    log(message);
+                }
+                else
+                {
+                    log("No se pudo guardar el backup");
+                }
+                break;
+            default:
+                log("Error, demasiados argumentos. Recuerde que no puede usar espacios para el nombre del backup");
+                break;
+        }
+    }
+    
+    /***
+     * Reinicia el programa
+     */
     private void resetProgram()
     {
         try
@@ -177,41 +266,39 @@ public class ConsoleController
     private void changeValue(String[] commands)
     {
         Double newValue = null;
-        if(commands.length == 3)
+        switch (commands.length) 
         {
-            if(vars.containsKey(commands[1]))
-            {
-                if(isNumeric(commands[2]))
+            case 3:
+                if(vars.containsKey(commands[1]))
                 {
-                    newValue = getNumericValue(commands[2]);
-                }
-                else if(vars.containsKey(commands[2]))
-                {
-                    newValue = vars.get(commands[2]);
+                    if(isNumeric(commands[2]))
+                    {
+                        newValue = getNumericValue(commands[2]);
+                    }
+                    else if(vars.containsKey(commands[2]))
+                    {
+                        newValue = vars.get(commands[2]);
+                    }
+                    else
+                    {
+                        log("Error, el valor destino es invalido");
+                        return;
+                    }
                 }
                 else
                 {
-                    log("Error, el valor destino es invalido");
+                    log("Error, la variable a asignar el valor no existe");
                     return;
-                }
-            }
-            else
-            {
-                log("Error, la variable a asignar el valor no existe");
-                return;
-            }
-        }
-        else if(commands.length==4)
-        {
-            newValue = executeOperationOneArgument(subArray(commands,2,3), false);
-        }
-        else if(commands.length == 5)
-        {
-            newValue = executeOperationTwoArguments(subArray(commands,2,4), false);
-        }
-        else
-        {
-            log("Error, no se usaron los argumentos adecuados");
+                }   break;
+            case 4:
+                newValue = executeOperationOneArgument(subArray(commands,2,3), false);
+                break;
+            case 5:
+                newValue = executeOperationTwoArguments(subArray(commands,2,4), false);
+                break;
+            default:
+                log("Error, no se usaron los argumentos adecuados");
+                break;
         }
         if(newValue==null)
         {
@@ -504,6 +591,7 @@ public class ConsoleController
            + "helpti:    Muestra ayuda con el manejo de CommandOS\n"
            + "inc:       Incrementa en uno una variable\n"
            + "ln:        Obtiene el logaritmo natural de un valor (variable o numero)\n"
+           + "load:      Carga los datos desde un archivo\n"
            + "log:       Obtiene el logaritmo base n de un valor\n"
            + "modus:     Calcula el residuo de la division de dos valores (variable o numeros)\n"
            + "multi:     Multiplica dos valores(variable o numeros)\n"
@@ -511,6 +599,7 @@ public class ConsoleController
            + "prompti:   Cambia el prompt de la consola\n"
            + "reset:     Reinicia el programa\n"
            + "rest:      Resta dos valores (variable o numeros)\n"
+           + "save:      Guarda los datos en un archivo\n"
            + "sqrt:      Obtiene la raiz cuadrado de un valor (variable o numero)\n"
            + "sum:       Suma dos valores (variable o numeros)\n"
            + "time:      Muestra el tiempo que lleva el programa corriendo\n"
@@ -551,6 +640,7 @@ public class ConsoleController
                     case "helpti":
                     case "inc":
                     case "ln":
+                    case "load":
                     case "log":
                     case "modus":
                     case "multi":
@@ -563,6 +653,7 @@ public class ConsoleController
                         text += "Reinicia el programa. Borra las variables y devuelve todo a sus valores iniciales";
                         break;
                     case "rest":
+                    case "save":
                     case "sqrt":
                     case "sum":
                     case "time":
@@ -744,9 +835,41 @@ public class ConsoleController
      * @param array array orignal
      * @param beg inicio
      * @param end fin
-     * @return 
+     * @return subarray
      */
-    public static<T> T[] subArray(T[] array, int beg, int end) {
-		return Arrays.copyOfRange(array, beg, end + 1);
-	}
+    private static<T> T[] subArray(T[] array, int beg, int end) 
+    {
+        return Arrays.copyOfRange(array, beg, end + 1);
+    }
+        public String getPrompt() {
+        return prompt;
+    }
+
+    public void setPrompt(String prompt) {
+        this.prompt = prompt;
+    }
+
+    public Hashtable<String, Double> getVars() {
+        return vars;
+    }
+
+    public void setVars(Hashtable<String, Double> vars) {
+        this.vars = vars;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    public String getActualBackup() {
+        return actualBackup;
+    }
+
+    public void setActualBackup(String actualBackup) {
+        this.actualBackup = actualBackup;
+    }
 }
