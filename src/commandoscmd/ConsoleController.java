@@ -48,6 +48,9 @@ public class ConsoleController
         String[] commands = command.split(" ");
         switch(commands[0].trim().toLowerCase())
         {
+            case "info":
+                showInfo();
+                break;
             case "save":
                 save(commands);
                 break;
@@ -110,6 +113,17 @@ public class ConsoleController
                 log("No se reconoce el comando "+commands[0].trim()+".\nPruebe de nuevo o escriba helpti para obtener ayuda");
                 break;
         }
+    }
+    
+    private void showInfo()
+    {
+        String msg = "Informacion del sistema:\n";
+        msg += "Procesadores disponibles (cores): " + Runtime.getRuntime().availableProcessors()+"\n";
+        msg += "Memoria libre (bytes): " + Runtime.getRuntime().freeMemory()+"\n";
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        msg += "Memoria maxima (bytes): " + (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory)+"\n";
+        msg += "Memoria disponible para JVM (bytes): " + Runtime.getRuntime().totalMemory();
+        log(msg);
     }
     
     /***
@@ -582,27 +596,28 @@ public class ConsoleController
            String text = "Para obtener mas detalles de cada comando, escriba helpti seguido "
            + "del nombre del comando:\n"
            + "ciao:      Sale de CommandOS\n"
-           + "clear:     Limpia la consola\n"
-           + "date:      Muestra la fecha y hora actual\n"
+           + "*clear:    Limpia la consola\n"
+           + "*date:     Muestra la fecha y hora actual\n"
            + "dec:       Decrementa en uno una variable\n"
            + "divi:      Divide dos valores (variable o numeros)\n"
            + "fact:      Obtiene el factorial de un valor (variable o numero)\n"
-           + "free:      Libera el espacio de una variable\n"
+           + "*free:     Libera el espacio de una variable\n"
            + "helpti:    Muestra ayuda con el manejo de CommandOS\n"
            + "inc:       Incrementa en uno una variable\n"
+           + "*info:     Muestra informacion del SO\n"
            + "ln:        Obtiene el logaritmo natural de un valor (variable o numero)\n"
-           + "load:      Carga los datos desde un archivo\n"
+           + "*load:     Carga los datos desde un archivo\n"
            + "log:       Obtiene el logaritmo base n de un valor\n"
            + "modus:     Calcula el residuo de la division de dos valores (variable o numeros)\n"
            + "multi:     Multiplica dos valores(variable o numeros)\n"
            + "pow:       Eleva un valor a una potencia (variables o numeris)\n"
            + "prompti:   Cambia el prompt de la consola\n"
-           + "reset:     Reinicia el programa\n"
+           + "*reset:    Reinicia el programa\n"
            + "rest:      Resta dos valores (variable o numeros)\n"
-           + "save:      Guarda los datos en un archivo\n"
+           + "*save:     Guarda los datos en un archivo\n"
            + "sqrt:      Obtiene la raiz cuadrado de un valor (variable o numero)\n"
            + "sum:       Suma dos valores (variable o numeros)\n"
-           + "time:      Muestra el tiempo que lleva el programa corriendo\n"
+           + "*time:     Muestra el tiempo que lleva el programa corriendo\n"
            + "value:     Muestra el valor de la(s) variable(s)\n"
            + "vari:      Crea variables numericas";
            log(text);   
@@ -638,9 +653,18 @@ public class ConsoleController
                                 + "se separan por espacios.";
                         break;
                     case "helpti":
+                        text += "Muestra ayuda de cada comando. Use helpti para obtener una lista de todos los comandos, o separe por espacios\n"
+                                + "cada comando para obtener mas detalles de cada uno";
+                        break;
                     case "inc":
+                    case "info":
+                        text += "Muestra la informacion del hardware del sistema. No requiere mas argumentos";
+                        break;
                     case "ln":
                     case "load":
+                        text += "Carga datos guardados en un archivo.Se especifica el nombre despues de un espacio y dicho nombre se usara para guardar\n"
+                                + "los datos en un futuro";
+                        break;
                     case "log":
                     case "modus":
                     case "multi":
@@ -654,6 +678,9 @@ public class ConsoleController
                         break;
                     case "rest":
                     case "save":
+                        text += "Guardar la informacion almacenada en el momento. Se necesita especificar un nombre sin espacio para guardar dicho\n"
+                                + "backup. Se puede no especificar un nombre cuando ya ha sido cargado con load o guardado anteriormente";
+                        break;
                     case "sqrt":
                     case "sum":
                     case "time":
