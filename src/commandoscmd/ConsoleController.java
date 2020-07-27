@@ -57,6 +57,9 @@ public class ConsoleController
             case "load":
                 load(commands);
                 break;
+            case "swap":
+                swap(commands);
+                break;
             case "inc":
             case "dec":
             case "sqrt":
@@ -115,6 +118,36 @@ public class ConsoleController
         }
     }
     
+    private void swap(String[] commands)
+    {
+        if(commands.length == 3)
+        {
+            String var1 = commands[1].trim();
+            String var2 = commands[2].trim();
+            Double val1,val2;
+            System.out.println(var1+" "+var2);
+            if(vars.containsKey(var1) && vars.containsKey(var2))
+            {
+                val1 = vars.get(var1);
+                val2 = vars.get(var2);
+                vars.replace(var1, val2);
+                vars.replace(var2, val1);
+                log("Valores intercambiados con exito. "+var1+" ="+vars.get(var1)+" y "+var2+" ="+vars.get(var2));
+            }
+            else
+            {
+                log("No existen el conjunto de variables dadas");
+            }
+        }
+        else
+        {
+            log("Numero de argumentos invalido, la sintaxis es <swap var1 var2>");
+        }
+    }
+    
+    /***
+     * Muestra la informacion de hardware del sistema
+     */
     private void showInfo()
     {
         String msg = "Informacion del sistema:\n";
@@ -617,6 +650,7 @@ public class ConsoleController
            + "*save:     Guarda los datos en un archivo\n"
            + "sqrt:      Obtiene la raiz cuadrado de un valor (variable o numero)\n"
            + "sum:       Suma dos valores (variable o numeros)\n"
+           + "*swap:     Intercambia el valor de dos variables entre si\n"
            + "*time:     Muestra el tiempo que lleva el programa corriendo\n"
            + "value:     Muestra el valor de la(s) variable(s)\n"
            + "vari:      Crea variables numericas";
@@ -648,6 +682,8 @@ public class ConsoleController
                                 + "Devuelve el resultado";
                         break;
                     case "fact":
+                        text += "Obtiene el factorial de un valor, ya sea numerico o de variable. El numero debe ser entero positivo. La sintaxis es <fact valor>";
+                        break;
                     case "free":
                         text += "Libera el espacio y el nombre de una o mas variables. La sintaxis es <free var(s)>. Las variables\n"
                                 + "se separan por espacios.";
@@ -657,15 +693,22 @@ public class ConsoleController
                                 + "cada comando para obtener mas detalles de cada uno";
                         break;
                     case "inc":
+                        text += "Incrementa en uno el valor de una variable. La sintaxis es <inc variable>";
+                        break;
                     case "info":
                         text += "Muestra la informacion del hardware del sistema. No requiere mas argumentos";
                         break;
                     case "ln":
+                        text += "Obtiene el logaritmo natural de un numero positivo, ya sea en numero o variable, su sintaxis es <ln valor>";
+                        break;
                     case "load":
                         text += "Carga datos guardados en un archivo.Se especifica el nombre despues de un espacio y dicho nombre se usara para guardar\n"
                                 + "los datos en un futuro";
                         break;
                     case "log":
+                        text += "Obtiene el logaritmo base b de un valor numerico n mayor a 0. Tanto b como n pueden ser numeros o variables. La sintaxis\n"
+                                + "es <log base numero>";
+                        break;
                     case "modus":
                     case "multi":
                     case "pow":
@@ -683,6 +726,9 @@ public class ConsoleController
                         break;
                     case "sqrt":
                     case "sum":
+                    case "swap":
+                        text += "Intercambia los valores de dos variables. No importa el orden, a ahora vale b y b ahora vale a";
+                        break;
                     case "time":
                         text += "Muestra en milisegundos el tiempo que lleva corriendo el programa. No requiere argumentos";
                         break;
