@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Set;
+import java.lang.Math;
+import java.lang.System;
+
 
 /**
  * Clase encargada de controlar los eventos
@@ -20,7 +23,7 @@ import java.util.Set;
  */
 public class ConsoleController 
 {
-    public String VERSION = "0.3";
+    public String VERSION = "0.5";
     private String prompt;
     private Hashtable<String, Double> vars;
     private long time;
@@ -112,9 +115,24 @@ public class ConsoleController
             case "reset":
                 resetProgram();
                 break;
+            case "echo":
+                echo(commands,command);
+                break;
             default:
                 log("No se reconoce el comando "+commands[0].trim()+".\nPruebe de nuevo o escriba helpti para obtener ayuda");
                 break;
+        }
+    }
+    
+    private void echo(String[] commands, String command)
+    {
+        if(commands.length == 1)
+        {
+            log("Especifique un mensaje a mostrar");
+        }
+        else
+        {
+            log(command.substring(commands[0].length()+1));
         }
     }
     
@@ -633,6 +651,7 @@ public class ConsoleController
            + "*date:     Muestra la fecha y hora actual\n"
            + "dec:       Decrementa en uno una variable\n"
            + "divi:      Divide dos valores (variable o numeros)\n"
+           + "*echo:     Muestra un mensaje en la consola\n"
            + "fact:      Obtiene el factorial de un valor (variable o numero)\n"
            + "*free:     Libera el espacio de una variable\n"
            + "helpti:    Muestra ayuda con el manejo de CommandOS\n"
@@ -678,8 +697,11 @@ public class ConsoleController
                                 + "Solo funciona con variables declaradas";
                         break;
                     case "divi":
-                        text += "Divide dos valores, que pueden ser numeros o variables. La sintaxis es <divi numerador denominador>.\n"
+                        text += "Divide dos valores, que pueden ser numeros o variables. La sintaxis es <divi dividendo divisor>.\n"
                                 + "Devuelve el resultado";
+                        break;
+                    case "echo":
+                        text += "Muestra como mensaje todo lo que se escriba despues del comando y un espacio";
                         break;
                     case "fact":
                         text += "Obtiene el factorial de un valor, ya sea numerico o de variable. El numero debe ser entero positivo. La sintaxis es <fact valor>";
@@ -710,8 +732,16 @@ public class ConsoleController
                                 + "es <log base numero>";
                         break;
                     case "modus":
+                        text += "Obtiene el residuo de una division de dos valores (numeros o variables), donde el primer argumento es el\n"
+                                + "dividendo y el segundo el divisor";
+                        break;
                     case "multi":
+                        text += "Multiplica dos numeros o variables. Siendo la sintaxis <multi num1 num2>)";
+                        break;
                     case "pow":
+                        text += "Obtiene un numero elevado a otro (numeros o variables). El primer argumento es el numero y el segundo es\n"
+                                + "la potencia a la que se eleva";
+                        break;
                     case "prompti":
                         text += "Cambia el prompt del sistema. La sintaxis es <prompti nuevoPrompt>. Se pueden usar espacios. Si no\n"
                                 + "especifican argumentos se vuelve al prompt por default";
@@ -720,12 +750,18 @@ public class ConsoleController
                         text += "Reinicia el programa. Borra las variables y devuelve todo a sus valores iniciales";
                         break;
                     case "rest":
+                        text += "Resta dos valores, ya sean numeros o variables. El primer argumento es el minuendo y el segundo el sustraendo";
+                        break;
                     case "save":
                         text += "Guardar la informacion almacenada en el momento. Se necesita especificar un nombre sin espacio para guardar dicho\n"
                                 + "backup. Se puede no especificar un nombre cuando ya ha sido cargado con load o guardado anteriormente";
                         break;
                     case "sqrt":
+                        text += "Obtiene la raiz cuadrada de un valor (variable o numero). Su sintaxis es <sqrt identificador>";
+                        break;
                     case "sum":
+                        text += "Suma dos valores, ya sean variables o numeros. La sintaxis es <sum num1 num2>, no importa el orden";
+                        break;
                     case "swap":
                         text += "Intercambia los valores de dos variables. No importa el orden, a ahora vale b y b ahora vale a";
                         break;
@@ -751,6 +787,9 @@ public class ConsoleController
         }
     }
     
+    /***
+     * Limpia la pantalla
+     */
     private void clearScreen()
     {
         try
